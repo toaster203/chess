@@ -1,68 +1,54 @@
 import './ChessBoard.css';
 import {useEffect, useRef, useState} from 'react';
 import figures from '../images/figures.png'
-
+import { initChessPieces } from './ChessPiece'; 
 var image = new Image();
 image.src = figures;
 
-
+const WHITEPIECE = 1
+const BLACKPIECE = 0
+const PIECEWIDTH = 56
+const PIECEHIGHT = 60
+const XOFFSET =28
 const ChessBoard = () => {
     const canvasRef = useRef(null);
     const contextRef = useRef(null);
-    const [isDrawing, setIsDrawing] = useState(false);
-
-
-    const startDrawing = ({nativeEvent}) => {
-        const {offsetX, offsetY} = nativeEvent;
-        contextRef.current.beginPath();
-        contextRef.current.moveTo(offsetX, offsetY);
-        contextRef.current.lineTo(offsetX, offsetY);
-        contextRef.current.stroke();
-        setIsDrawing(true);
-        nativeEvent.preventDefault();
-    };
-
-    const draw = ({nativeEvent}) => {
-        if(!isDrawing) {
-           return;
-       }        
-        const {offsetX, offsetY} = nativeEvent;
-        contextRef.current.lineTo(offsetX, offsetY);
-        contextRef.current.stroke();
-        nativeEvent.preventDefault();
-    };
-
-    const stopDrawing = () => {
-        contextRef.current.closePath();
-        setIsDrawing(false);
-    };
-
+    const [whitePieces, setWhitePieces] = useState(initChessPieces(WHITEPIECE))
+    const [blackPieces, setBlackPieces] = useState(initChessPieces(BLACKPIECE))
     useEffect(() => {
-        const timer = setInterval(() => {
-            const canvas = canvasRef.current;
-            const context = canvas.getContext("2d");
-            context.lineCap = "round";
-            context.strokeStyle = "black";
-            context.lineWidth = 5;
-            contextRef.current = context;
-            contextRef.current.drawImage(image,0,0, 56, 60, 25,25, 56,60) 
-            contextRef.current.drawImage(image,0,60, 56, 60,25,425, 56,60) 
-            console.log("drawing figures.")
-    
-        }, 500)
-        return () => clearInterval(timer)
-      },[])
-    
+        const canvas = canvasRef.current;
+        const context = canvas.getContext("2d");
+        contextRef.current = context;
+        whitePieces.forEach( piece=>{
+            drawPiece(piece)
+        })
+        blackPieces.forEach( piece=>{
+            drawPiece(piece)
+        })
+    },[])
+
+    const drawPiece = (piece) =>{
+        const figureX = piece.figurePosition * PIECEWIDTH
+        const figureY = piece.color * PIECEHIGHT
+        const x = piece.x * PIECEWIDTH + XOFFSET
+        const y = piece.y * PIECEWIDTH + XOFFSET
+        contextRef.current.drawImage(image,
+            figureX,
+            figureY,
+            PIECEWIDTH,
+            PIECEHIGHT,
+            x,
+            y,
+            PIECEWIDTH,
+            PIECEHIGHT) 
+    }
+
     return (
         <div>
             <canvas className="canvas-container"
                 width={504}
                 height={504}
                 ref={canvasRef}
-                onMouseDown={startDrawing}
-                onMouseMove={draw}
-                onMouseUp={stopDrawing}
-                onMouseLeave={stopDrawing}
                 >
             </canvas>
         </div>
