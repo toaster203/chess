@@ -1,3 +1,7 @@
+const PIECEWIDTH = 56
+const PIECEHIGHT = 60
+const XOFFSET =28
+
 export var ChessPiece = {
     color: 0,   // black
     x:  0,      // board x position
@@ -11,6 +15,7 @@ export const initChessPieces = color =>{
         x:0,
         y: color*7,
         figurePosition:0,
+        name:"rook"
     }
     let rook1 = {...rook}
     rook1.x=7
@@ -19,6 +24,7 @@ export const initChessPieces = color =>{
         x:1,
         y:color*7,
         figurePosition:1,
+        name:"knight"
     }
     let knight1 = {...knight}
     knight1.x = 6
@@ -27,6 +33,7 @@ export const initChessPieces = color =>{
         x:2,
         y:color*7,
         figurePosition:2,
+        name:"bishop"
     }
     let bishop1 = {...bishop}
     bishop1.x = 5
@@ -35,12 +42,14 @@ export const initChessPieces = color =>{
         x:3,
         y:color*7,
         figurePosition:3,
+        name:"queen"
     }
     const king = {
         color,
         x:4,
         y:color*7,
         figurePosition:4,
+        name:"king"
     }
     let pieces = []
     pieces.push(rook)
@@ -57,8 +66,18 @@ export const initChessPieces = color =>{
             x: i,
             y: color ? 6: 1,
             figurePosition:5,
+            name:"pawn"
         }
         pieces.push(pawn)
     }
     return pieces
+}
+
+export const getPiece = (x,y, pieces) =>{
+    if(pieces === undefined) return null
+    return pieces.find( function (piece){
+        const px = piece.x * PIECEWIDTH + XOFFSET 
+        const py = piece.y * PIECEWIDTH + XOFFSET
+        return  (x > px && x < px +  PIECEWIDTH && y > py && y< py +PIECEHIGHT)
+    })
 }
