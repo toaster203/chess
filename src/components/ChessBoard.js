@@ -118,6 +118,13 @@ const ChessBoard = () => {
         const {x,y} = nativeEvent;
         if(selectedPiece!==null && selectedPiece!==undefined){
             selectedPiece.selected= false
+            const grid =getGrid(x,y)
+            if(grid!==null && 
+                selectedPiece!==null &&
+               !(grid.x=== selectedPiece.x && grid.y=== selectedPiece.y)){
+                selectedPiece.x = grid.x
+                selectedPiece.y = grid.y
+            }
             movePiece( x,y)
             selectedPiece=null
         }
