@@ -15,7 +15,8 @@ export const initChessPieces = color =>{
         x:0,
         y: color*7,
         figurePosition:0,
-        name:"rook"
+        name:"rook",
+        selected: false
     }
     let rook1 = {...rook}
     rook1.x=7
@@ -24,7 +25,9 @@ export const initChessPieces = color =>{
         x:1,
         y:color*7,
         figurePosition:1,
-        name:"knight"
+        name:"knight",
+        selected: false
+
     }
     let knight1 = {...knight}
     knight1.x = 6
@@ -33,7 +36,9 @@ export const initChessPieces = color =>{
         x:2,
         y:color*7,
         figurePosition:2,
-        name:"bishop"
+        name:"bishop",
+        selected: false
+
     }
     let bishop1 = {...bishop}
     bishop1.x = 5
@@ -42,14 +47,18 @@ export const initChessPieces = color =>{
         x:3,
         y:color*7,
         figurePosition:3,
-        name:"queen"
+        name:"queen",
+        selected: false
+
     }
     const king = {
         color,
         x:4,
         y:color*7,
         figurePosition:4,
-        name:"king"
+        name:"king",
+        selected: false
+
     }
     let pieces = []
     pieces.push(rook)
@@ -66,7 +75,8 @@ export const initChessPieces = color =>{
             x: i,
             y: color ? 6: 1,
             figurePosition:5,
-            name:"pawn"
+            name:"pawn",
+            selected: false
         }
         pieces.push(pawn)
     }
@@ -75,6 +85,7 @@ export const initChessPieces = color =>{
 
 export const getPiece = (x,y, pieces) =>{
     if(pieces === undefined) return null
+    console.log(pieces)
     return pieces.find( function (piece){
         const px = piece.x * PIECEWIDTH + XOFFSET 
         const py = piece.y * PIECEWIDTH + XOFFSET

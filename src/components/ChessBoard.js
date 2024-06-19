@@ -12,6 +12,7 @@ const PIECEHIGHT = 60
 const XOFFSET =28
 const MARGIN_LEFT = 20
 const MARGIN_TOP = 50
+var selectedPiece = null
 
 const ChessBoard = () => {
     const canvasRef = useRef(null);
@@ -39,15 +40,28 @@ const ChessBoard = () => {
         const figureY = piece.color * PIECEHIGHT
         const x = piece.x * PIECEWIDTH + XOFFSET
         const y = piece.y * PIECEWIDTH + XOFFSET
-        contextRef.current.drawImage(image,
-            figureX,
-            figureY,
-            PIECEWIDTH,
-            PIECEHIGHT,
-            x,
-            y,
-            PIECEWIDTH,
-            PIECEHIGHT) 
+        if(!piece.selected){
+            contextRef.current.drawImage(image,
+                figureX,
+                figureY,
+                PIECEWIDTH,
+                PIECEHIGHT,
+                x,
+                y,
+                PIECEWIDTH,
+                PIECEHIGHT) 
+        }
+        else{
+            contextRef.current.drawImage(image,
+                figureX,
+                figureY,
+                PIECEWIDTH,
+                PIECEHIGHT,
+                piece.draggingX ,
+                piece.draggingY,
+                PIECEWIDTH,
+                PIECEHIGHT) 
+        }
     }
 
     const onMouseDown = ({nativeEvent}) => {
@@ -57,43 +71,52 @@ const ChessBoard = () => {
         console.log(x,y)
         console.log(whitePieces)
         
-        const piece = getPiece(x,y, whitePieces)
-        console.log(piece)
-        if(piece!==null){
-            var newPieces = whitePieces.filter((p)=>{
-                return p!==piece
-            })  
-            setWhitePieces(newPieces)
-            console.log(newPieces)
+        selectedPiece = getPiece(x,y, whitePieces)
+        console.log(selectedPiece)
+        if(selectedPiece!==null){
+            selectedPiece.selected= true
+            selectedPiece.draggingX = x - PIECEWIDTH/2
+            selectedPiece.draggingY = y - PIECEWIDTH/2
+            setWhitePieces([...whitePieces])
             console.log(whitePieces)
             contextRef.current.clearRect(0, 0, 504, 504);
-            draw(newPieces, blackPieces)        
-        }
-        
+            draw(whitePieces, blackPieces)        
+        }        
         nativeEvent.preventDefault();
     };
     const onMouseMove = ({nativeEvent}) => {
-        const {offsetX, offsetY} = nativeEvent;
+        var {x,y} = nativeEvent;
+        x -= MARGIN_LEFT
+        y -= MARGIN_TOP
+        if(selectedPiece!==null)
+        {
+            selectedPiece.draggingX = x - PIECEWIDTH/2
+            selectedPiece.draggingY = y - PIECEWIDTH/2
+            console.log(selectedPiece)
+            setWhitePieces([...whitePieces])
+            contextRef.current.clearRect(0, 0, 504, 504);
+            draw(whitePieces, blackPieces)        
+        }
         nativeEvent.preventDefault();
     };
 
     const onMouseUp = ({nativeEvent}) => {
         const {offsetX, offsetY} = nativeEvent;
+        console.log(selectedPiece)
+        if(selectedPiece!==null)
+        {
+            selectedPiece.selected= false
+            console.log(selectedPiece)
+            setWhitePieces([...whitePieces])
+            contextRef.current.clearRect(0, 0, 504, 504);
+            draw(whitePieces, blackPieces)        
+        }
         nativeEvent.preventDefault();
     };
-
     const onMouseLeave = ({nativeEvent}) => {
         const {offsetX, offsetY} = nativeEvent;
         nativeEvent.preventDefault();
     };
-/*
-    useEffect(() => {
-        const timer = setInterval(() => {
-        }, 300)
-        return () => clearInterval(timer)
-      }, [])
-*/    
-
     
     return (
         <div>
