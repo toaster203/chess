@@ -1,6 +1,8 @@
 const PIECEWIDTH = 56
 const PIECEHIGHT = 60
 const XOFFSET =28
+const MARGIN_LEFT = 20
+const MARGIN_TOP = 50
 
 export var ChessPiece = {
     color: 0,   // black
@@ -85,10 +87,13 @@ export const initChessPieces = color =>{
 
 export const getPiece = (x,y, pieces) =>{
     if(pieces === undefined) return null
-    console.log(pieces)
     return pieces.find( function (piece){
         const px = piece.x * PIECEWIDTH + XOFFSET 
         const py = piece.y * PIECEWIDTH + XOFFSET
-        return  (x > px && x < px +  PIECEWIDTH && y > py && y< py +PIECEHIGHT)
+        return  (x - MARGIN_LEFT > px && 
+                 x - MARGIN_LEFT < px +  PIECEWIDTH && 
+                 y - MARGIN_TOP> py && 
+                 y - MARGIN_TOP < py +PIECEHIGHT)
     })
 }
+
