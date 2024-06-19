@@ -73,7 +73,7 @@ const ChessBoard = () => {
         
         selectedPiece = getPiece(x,y, whitePieces)
         console.log(selectedPiece)
-        if(selectedPiece!==null){
+        if(selectedPiece!==null && selectedPiece!==undefined){
             selectedPiece.selected= true
             selectedPiece.draggingX = x - PIECEWIDTH/2
             selectedPiece.draggingY = y - PIECEWIDTH/2
@@ -88,8 +88,7 @@ const ChessBoard = () => {
         var {x,y} = nativeEvent;
         x -= MARGIN_LEFT
         y -= MARGIN_TOP
-        if(selectedPiece!==null)
-        {
+        if(selectedPiece!==null && selectedPiece!==undefined){
             selectedPiece.draggingX = x - PIECEWIDTH/2
             selectedPiece.draggingY = y - PIECEWIDTH/2
             console.log(selectedPiece)
@@ -103,8 +102,7 @@ const ChessBoard = () => {
     const onMouseUp = ({nativeEvent}) => {
         const {offsetX, offsetY} = nativeEvent;
         console.log(selectedPiece)
-        if(selectedPiece!==null)
-        {
+        if(selectedPiece!==null && selectedPiece!==undefined){
             selectedPiece.selected= false
             console.log(selectedPiece)
             setWhitePieces([...whitePieces])
