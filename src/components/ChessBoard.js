@@ -4,6 +4,7 @@ import figures from '../images/figures.png'
 import { initChessPieces,getPiece,getGrid } from './ChessPiece'; 
 import { validMove } from '../Utils/ValidMove';
 import { captureCheck } from '../Utils/CaptureCheck';
+import { initMoveHistory,addMove } from './ChessMove';
 
 var image = new Image();
 image.src = figures;
@@ -22,6 +23,8 @@ const ChessBoard = () => {
     const contextRef = useRef(null);
     const [whitePieces, setWhitePieces] = useState(initChessPieces(WHITEPIECE))
     const [blackPieces, setBlackPieces] = useState(initChessPieces(BLACKPIECE))
+    const [moveHistory, setMoveHistory] = useState(initMoveHistory())
+
     useEffect(() => {
         const canvas = canvasRef.current;
         const context = canvas.getContext("2d");
@@ -97,8 +100,7 @@ const ChessBoard = () => {
                  selectedPiece.validMoveGrids.forEach(grid =>{
                      highLightGrid(grid, "green")
                  })
-             }
- 
+             } 
             const grid =getGrid(x,y)
             console.log(grid)
             console.log(selectedPiece)
@@ -128,7 +130,6 @@ const ChessBoard = () => {
         movePiece(x,y)
         nativeEvent.preventDefault();
     };
-
     const onMouseUp = ({nativeEvent}) => {
         const {x,y} = nativeEvent;
         if(selectedPiece!==null && selectedPiece!==undefined){
@@ -137,9 +138,12 @@ const ChessBoard = () => {
             if(grid!==null && 
                 selectedPiece!==null &&
                !(grid.x=== selectedPiece.x && grid.y=== selectedPiece.y)){
-
                 if(selectedPiece.validMoveGrids.
                     find(v => v.x===grid.x && v.y === grid.y )){
+                    const source = {x:selectedPiece.x,y:selectedPiece.y}
+                    addMove(moveHistory, source, grid)
+                    console.log(moveHistory)
+                    
                     selectedPiece.x = grid.x
                     selectedPiece.y = grid.y
                     if(captureCheck(selectedPiece,  blackPieces) ){
