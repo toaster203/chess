@@ -3,6 +3,7 @@ import {useEffect, useRef, useState} from 'react';
 import figures from '../images/figures.png'
 import { initChessPieces,getPiece,getGrid } from './ChessPiece'; 
 import { validMove } from '../Utils/ValidMove';
+import { captureCheck } from '../Utils/CaptureCheck';
 
 var image = new Image();
 image.src = figures;
@@ -140,7 +141,10 @@ const ChessBoard = () => {
                 if(selectedPiece.validMoveGrids.
                     find(v => v.x===grid.x && v.y === grid.y )){
                     selectedPiece.x = grid.x
-                    selectedPiece.y = grid.y    
+                    selectedPiece.y = grid.y
+                    if(captureCheck(selectedPiece,  blackPieces) ){
+                        setBlackPieces([...blackPieces])
+                    }
                 }
                 else{
                     console.log("Invalid move to ", grid)
