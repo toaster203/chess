@@ -2,8 +2,6 @@ import './ChessBoard.css';
 import {useEffect, useRef, useState} from 'react';
 import figures from '../images/figures.png'
 import { initChessPieces,getPiece,getGrid } from './ChessPiece'; 
-import { validMove } from '../Utils/ValidMove';
-
 var image = new Image();
 image.src = figures;
 
@@ -39,8 +37,8 @@ const ChessBoard = () => {
         })
     }
 
-    const highLightGrid = (grid, color)=>{
-        contextRef.current.strokeStyle = color;
+    const highLightGrid = (grid)=>{
+        contextRef.current.strokeStyle = "yellow";
         contextRef.current.shadowColor = "#d53";
         contextRef.current.shadowBlur = 20;
         contextRef.current.lineJoin = "bevel";
@@ -90,14 +88,6 @@ const ChessBoard = () => {
             selectedPiece.draggingY = y - PIECEWIDTH/2 
             setWhitePieces([...whitePieces])
             draw(whitePieces, blackPieces)
-            if(selectedPiece.validMoveGrids &&
-                selectedPiece.selected
-             ){
-                 selectedPiece.validMoveGrids.forEach(grid =>{
-                     highLightGrid(grid, "green")
-                 })
-             }
- 
             const grid =getGrid(x,y)
             console.log(grid)
             console.log(selectedPiece)
@@ -105,7 +95,7 @@ const ChessBoard = () => {
                 selectedPiece!==null &&
                 selectedPiece.selected &&
                !(grid.x=== selectedPiece.x && grid.y=== selectedPiece.y)){
-                highLightGrid(grid, "yellow")
+                highLightGrid(grid)
             }
         }            
     }
@@ -115,10 +105,6 @@ const ChessBoard = () => {
         if(selectedPiece!==null && selectedPiece!==undefined){
             selectedPiece.selected= true
             movePiece( x,y)
-            if(!selectedPiece.validMoveGrids){
-                selectedPiece.validMoveGrids = validMove(selectedPiece, whitePieces,blackPieces)
-                console.log(selectedPiece.validMoveGrids)
-            }
         }
         nativeEvent.preventDefault();
     };
@@ -136,17 +122,9 @@ const ChessBoard = () => {
             if(grid!==null && 
                 selectedPiece!==null &&
                !(grid.x=== selectedPiece.x && grid.y=== selectedPiece.y)){
-
-                if(selectedPiece.validMoveGrids.
-                    find(v => v.x===grid.x && v.y === grid.y )){
-                    selectedPiece.x = grid.x
-                    selectedPiece.y = grid.y    
-                }
-                else{
-                    console.log("Invalid move to ", grid)
-                }
+                selectedPiece.x = grid.x
+                selectedPiece.y = grid.y
             }
-            selectedPiece.validMoveGrids = null
             movePiece( x,y)
             selectedPiece=null
         }
