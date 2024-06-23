@@ -63,13 +63,6 @@ const ChessBoard = () => {
                 piece.draggingY - MARGIN_TOP,
                 PIECEWIDTH,
                 PIECEHIGHT) 
-            contextRef.current.strokeStyle = "blue";
-            contextRef.current.shadowColor = "#d53";
-            contextRef.current.shadowBlur = 20;
-            contextRef.current.lineJoin = "bevel";
-            contextRef.current.lineWidth = 5;
-            contextRef.current.strokeStyle = "#38f";
-            contextRef.current.strokeRect(x, y, PIECEWIDTH, PIECEHIGHT);
         }
     }
     const movePiece = (x,y) =>{
