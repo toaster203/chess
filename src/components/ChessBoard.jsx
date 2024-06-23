@@ -2,6 +2,8 @@ import './ChessBoard.css';
 import {useEffect, useRef, useState} from 'react';
 import figures from '../images/figures.png'
 import { initChessPieces } from './ChessPiece'; 
+import getPieceAt from '../utils/getPieceAt';
+
 let image = new Image();
 image.src = figures;
 
@@ -17,9 +19,9 @@ const ChessBoard = () => {
     const contextRef = useRef(null);
     const [whitePieces, setWhitePieces] = useState(initChessPieces(WHITEPIECE))
     const [blackPieces, setBlackPieces] = useState(initChessPieces(BLACKPIECE))
-    const [currentPiece, setCurrentPiece] = useState(null);
     const [selectedPiece, setSelectedPiece] = useState(null);
 
+    // draw board on start
     useEffect(() => {
         const canvas = canvasRef.current;
         const context = canvas.getContext("2d");
@@ -27,27 +29,28 @@ const ChessBoard = () => {
         drawBoard(whitePieces, blackPieces);
     },[whitePieces, blackPieces]);
 
+    // draw board on piece move / selection
+    useEffect(() => {
+        if (contextRef) {
+            drawBoard(whitePieces, blackPieces);
+        }
+    }, [whitePieces, blackPieces, selectedPiece]);
+
     const drawBoard = (whitePieces, blackPieces) => {
-        contextRef.current.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+        contextRef.current.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height); // clear old selections
         let isSelected = false;
-        whitePieces.forEach( piece=>{
+        const allPieces = whitePieces.concat(blackPieces);
+        allPieces.forEach(piece=> {
             isSelected = false;
             if (piece === selectedPiece) {
                 isSelected = true;
-                console.log("selected piece", piece);
-            }
-            drawPiece(piece, isSelected);
-        })
-        blackPieces.forEach( piece=>{
-            isSelected = false;
-            if (piece === selectedPiece) {
-                isSelected = true;
-                //console.log("selected piece", piece);
+                console.log("selected piece", piece.name);
             }
             drawPiece(piece, isSelected);
         })
     };
 
+    // determine mouse position
     const getMousePos = (e) => {
         const canvas = canvasRef.current;
         const rect = canvas.getBoundingClientRect();
@@ -59,41 +62,32 @@ const ChessBoard = () => {
         return {snapX, snapY};
     }
 
-    const handleMouseMove = (e) =>{
-        const {snapX, snapY} = getMousePos(e);
-        //console.log(e.clientX, e.clientY, rect.left, rect.top, snapX, snapY)
-
-        let piece = getPieceAt(snapX, snapY);
-        if (piece) {
-            //console.log(piece);
-        }
-
-        setCurrentPiece(piece);
-    }
-
+    // handle clicking pieces
     const handleMouseDown = (e) => {
-        console.log("current selected:", selectedPiece);
-        if (!selectedPiece) {
-            setSelectedPiece(currentPiece);
-            console.log("setting selected piece", selectedPiece);
-        } else {
-            console.log("moving selected piece", selectedPiece);
-            const {snapX, snapY} = getMousePos(e);
+        const {snapX, snapY} = getMousePos(e);
+
+        let piece = getPieceAt(snapX, snapY, whitePieces, blackPieces);
+        if (!selectedPiece) { // select piece
+            if (piece) {
+                setSelectedPiece(piece); 
+            }
+        } else { // select square
+            if (piece && (piece.color !== selectedPiece.color)) { // if capturing opponent piece
+                if (piece.color === WHITEPIECE) {
+                    setWhitePieces(whitePieces.filter(p => p !== piece));
+                } else {
+                    setBlackPieces(blackPieces.filter(p => p !== piece));
+                }
+            }
+            
             selectedPiece.x = snapX;
             selectedPiece.y = snapY;
-            console.log("moved to ", selectedPiece.x, selectedPiece.y, " unsetting");
             setSelectedPiece(null);
         }
-        
-
-        if (contextRef) drawBoard(whitePieces, blackPieces);
     }
 
-    const getPieceAt = (x, y) =>{
-        const allPieces = whitePieces.concat(blackPieces);
-        return allPieces.find(piece => piece.x === x && piece.y === y);
-    }
-
+    
+    // draw piece on board
     const drawPiece = (piece, isSelected) =>{
         const figureX = piece.figurePosition * PIECEWIDTH;
         const figureY = piece.color * PIECEHEIGHT;
@@ -103,7 +97,6 @@ const ChessBoard = () => {
         if (isSelected) {
             contextRef.fillStyle = 'rgba(255, 255, 0, 0.5)';
             contextRef.current.fillRect(x, y, PIECEWIDTH, PIECEHEIGHT);
-            console.log("drawing selected");
         }
 
         contextRef.current.drawImage(image,
@@ -122,7 +115,6 @@ const ChessBoard = () => {
             <canvas className="canvas-container"
                 width={504}
                 height={504}
-                onMouseMove={handleMouseMove}
                 onMouseDown={handleMouseDown}
                 ref={canvasRef}
                 >
