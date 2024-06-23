@@ -22,6 +22,7 @@ const ChessBoard = () => {
     const [blackPieces, setBlackPieces] = useState(initChessPieces(BLACKPIECE))
     const [selectedPiece, setSelectedPiece] = useState(null);
     const [validMoves, setValidMoves] = useState([]);
+    const [currentTurn, setCurrentTurn] = useState(WHITEPIECE);
 
     // draw board on start
     useEffect(() => {
@@ -79,18 +80,16 @@ const ChessBoard = () => {
 
         let piece = getPieceAt(snapX, snapY, whitePieces, blackPieces);
         if (!selectedPiece) { // select piece
-            if (piece) {
+            if (piece && piece.color === currentTurn) {
                 setSelectedPiece(piece); 
                 setValidMoves(getValidMoves(piece, whitePieces, blackPieces));
             }
         } else { // select square
-            console.log(validMoves);
             const isValidMove = validMoves.find(move => (move.x === snapX && move.y === snapY));
-            console.log(isValidMove);
             if (isValidMove) {
                 selectedPiece.x = snapX;
                 selectedPiece.y = snapY;
-                
+
                 if (piece && (piece.color !== selectedPiece.color)) { // if capturing opponent piece
                     if (piece.color === WHITEPIECE) {
                         setWhitePieces(whitePieces.filter(p => p !== piece));
@@ -98,12 +97,10 @@ const ChessBoard = () => {
                         setBlackPieces(blackPieces.filter(p => p !== piece));
                     }
                 }
-
-                console.log("moved", selectedPiece.name, "to", snapX, snapY);
-                setSelectedPiece(null);
-                setValidMoves([]);
+                setCurrentTurn(currentTurn === WHITEPIECE ? BLACKPIECE : WHITEPIECE);
             }
-            
+            setValidMoves([]);
+            setSelectedPiece(null);
         }
     }
 
@@ -132,14 +129,21 @@ const ChessBoard = () => {
     }
 
     return (
-        <div>
-            <canvas className="canvas-container"
-                width={504}
-                height={504}
-                onMouseDown={handleMouseDown}
-                ref={canvasRef}
-                >
-            </canvas>
+        <div className="wrapper">
+            <div className="board">
+                <div className="info-container">
+                    <div>Current turn:</div>
+                    <div className="to-move" style={{ backgroundColor: (currentTurn === WHITEPIECE ? "white" : "black") }}/>
+                </div>
+                <canvas className="canvas-container"
+                    width={504}
+                    height={504}
+                    onMouseDown={handleMouseDown}
+                    ref={canvasRef}
+                    >
+                </canvas>
+                
+            </div>
         </div>
     )
 }

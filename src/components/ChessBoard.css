@@ -2,7 +2,29 @@
     height: 504px;
     width: 504px;
     border: 2px solid #000;
-    margin-left: 20px;
-    margin-top: 50px;
     background: url(../images/board.png);
+}
+
+.wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: auto;
+    height: 100vh;
+}
+
+.board {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.to-move {
+    width: 100px; 
+    height: 50px;
+    border: 1px solid black;
+}
+
+.info-container {
+    margin-right: 30px;
 }
