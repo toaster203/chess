@@ -27,8 +27,6 @@ const ChessBoard = () => {
     },[])
 
     const draw = (wPieces, bPieces)=>{
-        contextRef.current.clearRect(0, 0, canvasRef.current.width
-            , canvasRef.current.height);
         wPieces.forEach( piece=>{
             drawPiece(piece)
         })
@@ -59,40 +57,57 @@ const ChessBoard = () => {
                 figureY,
                 PIECEWIDTH,
                 PIECEHIGHT,
-                piece.draggingX - MARGIN_LEFT ,
-                piece.draggingY - MARGIN_TOP,
+                piece.draggingX ,
+                piece.draggingY,
                 PIECEWIDTH,
                 PIECEHIGHT) 
         }
     }
-    const movePiece = (x,y) =>{
-        if(selectedPiece!==null && selectedPiece!==undefined){
-            selectedPiece.draggingX = x - PIECEWIDTH/2 
-            selectedPiece.draggingY = y - PIECEWIDTH/2 
-            setWhitePieces([...whitePieces])
-            draw(whitePieces, blackPieces)        
-        }            
-    }
+
     const onMouseDown = ({nativeEvent}) => {
         let {x,y} = nativeEvent;
+        x -= MARGIN_LEFT
+        y -= MARGIN_TOP
+        console.log(x,y)
+        console.log(whitePieces)
+        
         selectedPiece = getPiece(x,y, whitePieces)
+        console.log(selectedPiece)
         if(selectedPiece!==null && selectedPiece!==undefined){
             selectedPiece.selected= true
-            movePiece( x,y)
-        }
+            selectedPiece.draggingX = x - PIECEWIDTH/2
+            selectedPiece.draggingY = y - PIECEWIDTH/2
+            setWhitePieces([...whitePieces])
+            console.log(whitePieces)
+            contextRef.current.clearRect(0, 0, 504, 504);
+            draw(whitePieces, blackPieces)        
+        }        
         nativeEvent.preventDefault();
     };
     const onMouseMove = ({nativeEvent}) => {
         var {x,y} = nativeEvent;
-        movePiece(x,y)
+        x -= MARGIN_LEFT
+        y -= MARGIN_TOP
+        if(selectedPiece!==null && selectedPiece!==undefined){
+            selectedPiece.draggingX = x - PIECEWIDTH/2
+            selectedPiece.draggingY = y - PIECEWIDTH/2
+            console.log(selectedPiece)
+            setWhitePieces([...whitePieces])
+            contextRef.current.clearRect(0, 0, 504, 504);
+            draw(whitePieces, blackPieces)        
+        }
         nativeEvent.preventDefault();
     };
 
     const onMouseUp = ({nativeEvent}) => {
-        const {x,y} = nativeEvent;
+        const {offsetX, offsetY} = nativeEvent;
+        console.log(selectedPiece)
         if(selectedPiece!==null && selectedPiece!==undefined){
             selectedPiece.selected= false
-            movePiece( x,y)
+            console.log(selectedPiece)
+            setWhitePieces([...whitePieces])
+            contextRef.current.clearRect(0, 0, 504, 504);
+            draw(whitePieces, blackPieces)        
         }
         nativeEvent.preventDefault();
     };
