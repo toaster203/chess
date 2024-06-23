@@ -3,6 +3,7 @@ import {useEffect, useRef, useState} from 'react';
 import figures from '../images/figures.png'
 import { initChessPieces } from './ChessPiece'; 
 import getPieceAt from '../utils/getPieceAt';
+import { getValidMoves } from '../utils/getValidMoves';
 
 let image = new Image();
 image.src = figures;
@@ -20,13 +21,16 @@ const ChessBoard = () => {
     const [whitePieces, setWhitePieces] = useState(initChessPieces(WHITEPIECE))
     const [blackPieces, setBlackPieces] = useState(initChessPieces(BLACKPIECE))
     const [selectedPiece, setSelectedPiece] = useState(null);
+    const [validMoves, setValidMoves] = useState([]);
 
     // draw board on start
     useEffect(() => {
         const canvas = canvasRef.current;
         const context = canvas.getContext("2d");
         contextRef.current = context;
-        drawBoard(whitePieces, blackPieces);
+        image.onload = () => {
+            drawBoard(whitePieces, blackPieces);
+        }
     },[whitePieces, blackPieces]);
 
     // draw board on piece move / selection
@@ -40,14 +44,21 @@ const ChessBoard = () => {
         contextRef.current.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height); // clear old selections
         let isSelected = false;
         const allPieces = whitePieces.concat(blackPieces);
+        
+        validMoves.forEach(move => {
+            contextRef.current.fillStyle = 'rgba(0, 255, 0, 0.5)';
+            contextRef.current.fillRect(move.x * PIECEWIDTH + XOFFSET, move.y * PIECEWIDTH + XOFFSET, PIECEWIDTH, PIECEHEIGHT);
+        })
+
         allPieces.forEach(piece=> {
             isSelected = false;
             if (piece === selectedPiece) {
                 isSelected = true;
-                console.log("selected piece", piece.name);
             }
             drawPiece(piece, isSelected);
         })
+
+        
     };
 
     // determine mouse position
@@ -70,19 +81,29 @@ const ChessBoard = () => {
         if (!selectedPiece) { // select piece
             if (piece) {
                 setSelectedPiece(piece); 
+                setValidMoves(getValidMoves(piece, whitePieces, blackPieces));
             }
         } else { // select square
-            if (piece && (piece.color !== selectedPiece.color)) { // if capturing opponent piece
-                if (piece.color === WHITEPIECE) {
-                    setWhitePieces(whitePieces.filter(p => p !== piece));
-                } else {
-                    setBlackPieces(blackPieces.filter(p => p !== piece));
+            console.log(validMoves);
+            const isValidMove = validMoves.find(move => (move.x === snapX && move.y === snapY));
+            console.log(isValidMove);
+            if (isValidMove) {
+                selectedPiece.x = snapX;
+                selectedPiece.y = snapY;
+                
+                if (piece && (piece.color !== selectedPiece.color)) { // if capturing opponent piece
+                    if (piece.color === WHITEPIECE) {
+                        setWhitePieces(whitePieces.filter(p => p !== piece));
+                    } else {
+                        setBlackPieces(blackPieces.filter(p => p !== piece));
+                    }
                 }
+
+                console.log("moved", selectedPiece.name, "to", snapX, snapY);
+                setSelectedPiece(null);
+                setValidMoves([]);
             }
             
-            selectedPiece.x = snapX;
-            selectedPiece.y = snapY;
-            setSelectedPiece(null);
         }
     }
 
@@ -95,7 +116,7 @@ const ChessBoard = () => {
         const y = piece.y * PIECEWIDTH + YOFFSET;
 
         if (isSelected) {
-            contextRef.fillStyle = 'rgba(255, 255, 0, 0.5)';
+            contextRef.current.fillStyle = 'rgba(255, 255, 0, 0.5)';
             contextRef.current.fillRect(x, y, PIECEWIDTH, PIECEHEIGHT);
         }
 
