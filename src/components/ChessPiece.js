@@ -97,15 +97,3 @@ export const getPiece = (x,y, pieces) =>{
     })
 }
 
-export const getGrid = (canvasX, canvasY) =>{
-    console.log(canvasX, canvasY)
-    var grid = {
-        color: 0,   // black
-        x: Math.floor((canvasX - MARGIN_LEFT -XOFFSET) / PIECEWIDTH) ,      // board x position
-        y: Math.floor((canvasY - MARGIN_TOP - XOFFSET) / PIECEHIGHT),      // board y position
-    }
-    console.log(grid)
-    if(grid.x >=0 && grid.x <8 && grid.y>=0 && grid.y<8)
-        return grid
-    return null
-}

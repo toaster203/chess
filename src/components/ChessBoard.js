@@ -1,7 +1,7 @@
 import './ChessBoard.css';
 import {useEffect, useRef, useState} from 'react';
 import figures from '../images/figures.png'
-import { initChessPieces,getPiece,getGrid } from './ChessPiece'; 
+import { initChessPieces,getPiece } from './ChessPiece'; 
 var image = new Image();
 image.src = figures;
 
@@ -37,17 +37,6 @@ const ChessBoard = () => {
         })
     }
 
-    const highLightGrid = (grid)=>{
-        contextRef.current.strokeStyle = "yellow";
-        contextRef.current.shadowColor = "#d53";
-        contextRef.current.shadowBlur = 20;
-        contextRef.current.lineJoin = "bevel";
-        contextRef.current.lineWidth = 5;
-        const x = grid.x * PIECEWIDTH + XOFFSET
-        const y = grid.y * PIECEWIDTH + XOFFSET
-        contextRef.current.strokeRect(x, y, PIECEWIDTH, PIECEHIGHT);
-    }
-
     const drawPiece = (piece) =>{
         const figureX = piece.figurePosition * PIECEWIDTH
         const figureY = piece.color * PIECEHIGHT
@@ -74,6 +63,7 @@ const ChessBoard = () => {
                 piece.draggingY - MARGIN_TOP,
                 PIECEWIDTH,
                 PIECEHIGHT) 
+            contextRef.current.strokeStyle = "blue";
             contextRef.current.shadowColor = "#d53";
             contextRef.current.shadowBlur = 20;
             contextRef.current.lineJoin = "bevel";
@@ -87,16 +77,7 @@ const ChessBoard = () => {
             selectedPiece.draggingX = x - PIECEWIDTH/2 
             selectedPiece.draggingY = y - PIECEWIDTH/2 
             setWhitePieces([...whitePieces])
-            draw(whitePieces, blackPieces)
-            const grid =getGrid(x,y)
-            console.log(grid)
-            console.log(selectedPiece)
-            if(grid!==null && 
-                selectedPiece!==null &&
-                selectedPiece.selected &&
-               !(grid.x=== selectedPiece.x && grid.y=== selectedPiece.y)){
-                highLightGrid(grid)
-            }
+            draw(whitePieces, blackPieces)        
         }            
     }
     const onMouseDown = ({nativeEvent}) => {
@@ -119,7 +100,6 @@ const ChessBoard = () => {
         if(selectedPiece!==null && selectedPiece!==undefined){
             selectedPiece.selected= false
             movePiece( x,y)
-            selectedPiece=null
         }
         nativeEvent.preventDefault();
     };
